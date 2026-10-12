@@ -1,83 +1,122 @@
-# 📌 Comandos esenciales de Prisma
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../docs/img/logos/prisma-white.svg">
+  <img src="../docs/img/logos/prisma.svg" alt="Prisma" height="40">
+</picture>
 
-## 🛠️ Inicializar Prisma
-```sh
-npx prisma init
-```
-> Crea la estructura de Prisma en el proyecto (`prisma/schema.prisma` y `.env`).
+# Comandos de Prisma
 
-## 🔄 Generar el cliente de Prisma
-```sh
+[Volver al README](../README.md) | [Base de datos](../docs/BASE_DE_DATOS.md)
+
+Referencia rápida del CLI de [Prisma](https://www.prisma.io/docs/orm/reference/prisma-cli-reference).
+Todos los comandos se ejecutan desde la raíz del proyecto y leen `DATABASE_URL` del `.env`.
+
+## Uso habitual en este proyecto
+
+| Situación | Comando |
+|-----------|---------|
+| Después de `git pull` o de cambiar `schema.prisma` | `npx prisma generate` |
+| Crear o actualizar las tablas en desarrollo | `npx prisma db push` |
+| Ver y editar datos en el navegador | `npx prisma studio` |
+
+`npm install` ya ejecuta `prisma generate` automáticamente (script `postinstall`).
+
+## Cliente
+
+### Generar el cliente
+
+```bash
 npx prisma generate
 ```
-> Genera el cliente de Prisma basado en el esquema actual. Se debe ejecutar después de cada cambio en `schema.prisma`.
 
----
+Crea el cliente tipado (`@prisma/client`) a partir de `schema.prisma`. Hay que ejecutarlo
+después de cada cambio en el esquema; si no, TypeScript no reconocerá los modelos o campos
+nuevos.
 
-# 🔄 Migraciones
+## Sincronizar el esquema
 
-## 📌 Crear una nueva migración
-```sh
-npx prisma migrate dev --name nombre_migracion
-```
-> Crea y aplica una nueva migración en un entorno de desarrollo, generando los archivos SQL correspondientes.
+### Sin migraciones: `db push`
 
-## 🚀 Aplicar migraciones en producción
-```sh
-npx prisma migrate deploy
-```
-> Aplica todas las migraciones pendientes en la base de datos en producción.
-
-## ⚡ Sincronizar esquema sin borrar datos (`push`)
-```sh
+```bash
 npx prisma db push
 ```
-> Aplica cambios al esquema de la base de datos sin crear migraciones y sin borrar datos. Útil para entornos de desarrollo rápidos.
 
----
+Aplica el esquema directamente a la base de datos, sin crear archivos de migración. Es la
+forma en que se trabaja actualmente en este proyecto, porque `prisma/migrations` no
+contiene migraciones. Si un cambio implica perder datos (por ejemplo, borrar una columna),
+Prisma pide confirmación.
 
-# 📦 Manejo de la base de datos
+### Con migraciones: `migrate`
 
-## 🔍 Ver el estado actual de la base de datos
-```sh
+Las migraciones guardan cada cambio como un archivo SQL versionado, lo que permite
+reproducir la evolución del esquema en todos los entornos.
+
+```bash
+# Crear y aplicar una migración en desarrollo
+npx prisma migrate dev --name nombre_descriptivo
+
+# Aplicar en producción las migraciones pendientes
+npx prisma migrate deploy
+
+# Ver qué migraciones están aplicadas
 npx prisma migrate status
 ```
-> Muestra el estado de las migraciones aplicadas en la base de datos.
 
-## 🗑️ Resetear la base de datos (⚠️ Borra los datos)
-```sh
+Para pasar de `db push` a migraciones en una base que ya tiene tablas, consulta la guía
+oficial de [baselining](https://www.prisma.io/docs/orm/prisma-migrate/workflows/baselining).
+
+### Reiniciar la base de datos
+
+```bash
 npx prisma migrate reset
 ```
-> Borra la base de datos, vuelve a ejecutar migraciones y repuebla los datos.
 
----
+**Borra todos los datos**, vuelve a aplicar las migraciones y ejecuta el seed. Úsalo solo en
+desarrollo.
 
-# 🔍 Inspección y gestión de datos
+## Inspección
 
-## 📌 Ver los cambios en la base de datos
-```sh
+### Traer el esquema desde la base de datos
+
+```bash
 npx prisma db pull
 ```
-> Sincroniza `schema.prisma` con la base de datos existente sin modificar datos.
 
-## 🖥️ Abrir el Prisma Studio (interfaz visual para ver y modificar datos)
-```sh
+Lee la estructura de una base existente y **sobrescribe** `schema.prisma` para reflejarla.
+No modifica datos. Útil cuando la base se cambió por fuera de Prisma.
+
+### Prisma Studio
+
+```bash
 npx prisma studio
 ```
-> Abre una UI para visualizar y editar los datos en la base de datos.
 
----
+Abre una interfaz web (por defecto en `http://localhost:5555`) para ver y editar registros.
 
-# 🚀 Otros comandos útiles
+### Validar y formatear el esquema
 
-## 📌 Ejecutar scripts con Prisma
-```sh
-npx prisma execute --file script.sql
+```bash
+npx prisma validate   # comprueba que schema.prisma no tenga errores
+npx prisma format     # ordena y alinea el archivo
 ```
-> Permite ejecutar archivos SQL directamente en la base de datos.
 
-## 📊 Consultar datos desde CLI
-```sh
+## Otros comandos
+
+### Ejecutar SQL directamente
+
+```bash
+npx prisma db execute --file script.sql --schema prisma/schema.prisma
+```
+
+Ejecuta un archivo SQL contra la base definida en el esquema (es decir, en `DATABASE_URL`).
+La opción `--schema` (o `--url`) es obligatoria.
+
+### Poblar con datos de ejemplo
+
+```bash
 npx prisma db seed
 ```
-> Ejecuta un script para poblar la base de datos con datos iniciales.
+
+Ejecuta el script de seed configurado en la sección `"prisma": { "seed": ... }` de
+`package.json`. Este proyecto no tiene esa sección; usa en su lugar `npm run seed`, que
+ejecuta `prisma/seed.ts`. Ese archivo está desactualizado respecto al esquema actual (ver
+[observaciones](../docs/OBSERVACIONES.md#15-prismaseedts-no-compila)).

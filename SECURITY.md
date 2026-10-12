@@ -1,25 +1,44 @@
-# Security Policy
+# Política de seguridad
 
-## Supported Versions
+## Versiones con soporte
 
-Este proyecto mantiene actualizaciones de seguridad para las siguientes versiones:
+| Versión | Soporte de seguridad |
+|---------|----------------------|
+| Última versión publicada | Sí |
+| 1.0.x | Sí |
+| Anteriores a 1.0 | No |
 
-| Versión | Soporte |
-| -------- | ------- |
-| Latest   | ✅ |
-| 1.0.x    | ✅ |
-| < 1.0    | ❌ |
+Si usas una versión sin soporte, actualiza a la más reciente para recibir las correcciones
+de seguridad.
 
-Si estás usando una versión sin soporte, te recomendamos actualizar a la más reciente para garantizar seguridad y estabilidad.
+## Cómo reportar una vulnerabilidad
 
-## Reporte de Vulnerabilidades
+Si encuentras una vulnerabilidad en XicoNemi:
 
-Si encuentras una vulnerabilidad en Xiconemi, por favor repórtala siguiendo estos pasos:
+1. **No la publiques.** No abras un issue público ni la comentes en un pull request.
+2. **Contacta al equipo** por una de estas vías:
+   - correo a `xiconemi@gmail.com`;
+   - reporte privado desde la pestaña **Security** del repositorio en GitHub, opción
+     **Report a vulnerability** (GitHub Security Advisories).
+3. **Incluye en el reporte:**
+   - descripción clara del problema;
+   - versión o commit afectado;
+   - impacto potencial;
+   - pasos para reproducirlo.
 
-1. **No la publiques**: Para evitar riesgos, no divulgues la vulnerabilidad públicamente.
-2. **Contacta al equipo**: Envía un correo a `xiconemi@gmail.com` o abre un reporte privado en [GitHub Security Advisories](https://github.com/tu-repo/security/advisories).
-3. **Detalles del reporte**: Incluye una descripción clara, versiones afectadas, impacto potencial y pasos para reproducirla.
-4. **Tiempo de respuesta**: Nos comprometemos a responder en un plazo de 48 horas y trabajar en una solución rápida.
-5. **Reconocimiento**: Agradecemos a los investigadores de seguridad y, si lo deseas, podemos mencionarte en nuestros agradecimientos.
+## Qué esperar
 
-Gracias por contribuir a la seguridad de Xiconemi.
+- Respuesta inicial en un plazo de 48 horas.
+- Seguimiento mientras se prepara la corrección.
+- Si lo deseas, mención en los agradecimientos una vez publicada la solución.
+
+## Buenas prácticas para quien contribuye
+
+- Nunca subas el archivo `.env` ni credenciales al repositorio. Ya está incluido en
+  `.gitignore`.
+- Usa valores de `JWT_SECRET` largos y aleatorios, distintos en cada entorno.
+- Protege con `verifyToken` (y `authorizeRole` cuando corresponda) todo endpoint que lea o
+  modifique datos de otros usuarios.
+- No devuelvas el campo `password` en las respuestas, aunque esté cifrado.
+
+Gracias por ayudar a mantener XicoNemi seguro.
